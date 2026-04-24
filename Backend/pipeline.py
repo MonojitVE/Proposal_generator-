@@ -11,14 +11,31 @@ from core.section_generators import (
 )
 
 
-def generate_proposal(user_input: str) -> str:
+def generate_proposal(
+    user_input: str,
+    user_timeline: str = "",
+    user_budget: str = "",
+    user_phases: str = "",
+    user_resources: str = "",
+) -> str:
     """
     Main pipeline: generates a full proposal section by section.
+    Purpose of Document and Key Deliverables are generated LAST so they
+    have full context of the entire proposal, then inserted into their
+    correct positions in the final output.
 
     Parameters
     ----------
     user_input : str
         Short or detailed project description from the user.
+    user_timeline : str
+        Timeline directly from user input (not LLM-generated).
+    user_budget : str
+        Budget directly from user input (not LLM-generated).
+    user_phases : str
+        Number of phases directly from user input (not LLM-generated).
+    user_resources : str
+        Resources directly from user input (not LLM-generated).
 
     Returns
     -------
@@ -26,41 +43,17 @@ def generate_proposal(user_input: str) -> str:
         Complete formatted proposal as plain text.
     """
 
-    # ── Section 2: Purpose of Document ──────────────────────────────────────
-    print("Generating: Purpose of Document...")
-    previous = f"{contents}\n{company_overview}"
-    purpose_output = generate_purpose(previous)
-
-    # ── Section 3: Key Deliverables ──────────────────────────────────────────
-    print("Generating: Key Deliverables...")
-    previous = f"{contents}\n{company_overview}\n{purpose_output}"
-    deliverables_output = generate_key_deliverables(previous)
+    base = f"{contents}\n\n{company_overview}"
 
     # ── Section 4: Objectives ────────────────────────────────────────────────
     print("Generating: Objectives...")
-    previous = f"""
-{contents}
-
-{company_overview}
-
-{purpose_output}
-
-3 KEY DELIVERABLES
-{deliverables_output}
-"""
+    previous = base
     objective_output = generate_objectives(previous)
 
     # ── Section 5: Features and Functionality ────────────────────────────────
     print("Generating: Features and Functionality...")
     previous = f"""
-{contents}
-
-{company_overview}
-
-{purpose_output}
-
-3 KEY DELIVERABLES
-{deliverables_output}
+{base}
 
 4 OBJECTIVES
 {objective_output}
@@ -70,14 +63,7 @@ def generate_proposal(user_input: str) -> str:
     # ── Section 6: Technical Approach ────────────────────────────────────────
     print("Generating: Technical Approach...")
     previous = f"""
-{contents}
-
-{company_overview}
-
-{purpose_output}
-
-3 KEY DELIVERABLES
-{deliverables_output}
+{base}
 
 4 OBJECTIVES
 {objective_output}
@@ -90,14 +76,7 @@ def generate_proposal(user_input: str) -> str:
     # ── Section 7: Technology Stack ──────────────────────────────────────────
     print("Generating: Technology Stack...")
     previous = f"""
-{contents}
-
-{company_overview}
-
-{purpose_output}
-
-3 KEY DELIVERABLES
-{deliverables_output}
+{base}
 
 4 OBJECTIVES
 {objective_output}
@@ -113,14 +92,7 @@ def generate_proposal(user_input: str) -> str:
     # ── Section 8: Future Scope ──────────────────────────────────────────────
     print("Generating: Future Scope...")
     previous = f"""
-{contents}
-
-{company_overview}
-
-{purpose_output}
-
-3 KEY DELIVERABLES
-{deliverables_output}
+{base}
 
 4 OBJECTIVES
 {objective_output}
@@ -136,17 +108,13 @@ def generate_proposal(user_input: str) -> str:
 """
     future_scope_output = generate_future_scope(previous)
 
-    # ── Section 9: Time and Budget Estimate ──────────────────────────────────
+    # ── Section 9: Time and Budget Estimate (user input, no LLM) ─────────────
     print("Generating: Time and Budget Estimate...")
-    previous = f"""
-{contents}
+    time_budget_output = generate_time_budget(user_phases, user_timeline, user_resources)
 
-{company_overview}
-
-{purpose_output}
-
-3 KEY DELIVERABLES
-{deliverables_output}
+    # ── Full context for purpose + deliverables ──────────────────────────────
+    full_context = f"""
+{base}
 
 4 OBJECTIVES
 {objective_output}
@@ -162,8 +130,24 @@ def generate_proposal(user_input: str) -> str:
 
 8 FUTURE SCOPE
 {future_scope_output}
+
+9 TIME AND BUDGET ESTIMATE
+{time_budget_output}
 """
-    time_budget_output = generate_time_budget(previous)
+
+    # ── Section 2: Purpose of Document (generated with full context) ─────────
+    print("Generating: Purpose of Document...")
+    purpose_output = generate_purpose(full_context)
+
+    # ── Section 3: Key Deliverables (generated with full context) ────────────
+    print("Generating: Key Deliverables...")
+    previous = f"""
+{full_context}
+
+2 PURPOSE OF THE DOCUMENT
+{purpose_output}
+"""
+    deliverables_output = generate_key_deliverables(previous)
 
     # ── Assemble Final Proposal ──────────────────────────────────────────────
     final_text = f"""
