@@ -4,7 +4,11 @@ contents = """
 
 company_overview = """
 1 COMPANY OVERVIEW
-VirtualEmployee.com is a leading remote staffing company, headquartered near New Delhi, India with multiple branch offices across the country. The company specializes in providing dedicated remote professionals to global clients across various industries. With a strong focus on quality, scalability, and cost-effectiveness, VirtualEmployee.com enables businesses to build efficient remote teams tailored to their needs.
+VirtualEmployee.com is a leading remote staffing company, headquartered 
+near New Delhi, India with five branch offices in India, and one in the UK. Since 
+2007, it has been helping Small and Medium Businesses in 48 countries and 
+across 5 continents to hire dedicated virtual employees from India in any 
+domain or profession. The domains range from specialist skills like IT and ITES,. 
 """
 
 
