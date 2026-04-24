@@ -1,0 +1,192 @@
+import FormField from '../ui/FormField';
+import Button from '../ui/Button';
+import './ProposalForm.css';
+
+const PROJECT_TYPES = [
+  { value: 'web_app', label: 'Web Application' },
+  { value: 'mobile_app', label: 'Mobile Application' },
+  { value: 'api', label: 'API / Backend Service' },
+  { value: 'data_platform', label: 'Data Platform / Analytics' },
+  { value: 'ai_ml', label: 'AI / Machine Learning' },
+  { value: 'ecommerce', label: 'E-Commerce Platform' },
+  { value: 'crm', label: 'CRM / ERP System' },
+  { value: 'saas', label: 'SaaS Product' },
+  { value: 'other', label: 'Other' },
+];
+
+const INDUSTRIES = [
+  { value: 'healthcare', label: 'Healthcare' },
+  { value: 'fintech', label: 'FinTech / Finance' },
+  { value: 'edtech', label: 'EdTech / Education' },
+  { value: 'ecommerce', label: 'E-Commerce / Retail' },
+  { value: 'logistics', label: 'Logistics / Supply Chain' },
+  { value: 'real_estate', label: 'Real Estate' },
+  { value: 'legal', label: 'Legal / Compliance' },
+  { value: 'manufacturing', label: 'Manufacturing' },
+  { value: 'media', label: 'Media / Entertainment' },
+  { value: 'government', label: 'Government / Public Sector' },
+  { value: 'other', label: 'Other' },
+];
+
+const TIMELINES = [
+  { value: '1_month', label: '< 1 Month' },
+  { value: '1_3_months', label: '1 – 3 Months' },
+  { value: '3_6_months', label: '3 – 6 Months' },
+  { value: '6_12_months', label: '6 – 12 Months' },
+  { value: '12_plus', label: '12+ Months' },
+];
+
+const BUDGETS = [
+  { value: 'under_10k', label: 'Under $10,000' },
+  { value: '10k_25k', label: '$10,000 – $25,000' },
+  { value: '25k_50k', label: '$25,000 – $50,000' },
+  { value: '50k_100k', label: '$50,000 – $100,000' },
+  { value: '100k_plus', label: '$100,000+' },
+  { value: 'flexible', label: 'Flexible / TBD' },
+];
+
+export default function ProposalForm({ form, updateField, onSubmit, loading, error }) {
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSubmit();
+  };
+
+  return (
+    <form className="proposal-form" onSubmit={handleSubmit} noValidate>
+      {/* ── Section: Project Brief ── */}
+      <section className="proposal-form__section">
+        <div className="proposal-form__section-header">
+          <span className="proposal-form__section-num">01</span>
+          <div>
+            <h2 className="proposal-form__section-title">Project Brief</h2>
+            <p className="proposal-form__section-desc">
+              Describe what you're building — the more detail, the better the proposal.
+            </p>
+          </div>
+        </div>
+
+        <div className="proposal-form__fields">
+          <FormField
+            label="Project Description"
+            name="description"
+            as="textarea"
+            rows={5}
+            value={form.description}
+            onChange={updateField}
+            placeholder="e.g. A multi-tenant SaaS platform for managing employee onboarding workflows, with role-based access, document upload, e-signature integration, and an admin dashboard."
+            required
+            hint="Be specific about goals, users, and key capabilities."
+          />
+        </div>
+      </section>
+
+      {/* ── Section: Project Details ── */}
+      <section className="proposal-form__section">
+        <div className="proposal-form__section-header">
+          <span className="proposal-form__section-num">02</span>
+          <div>
+            <h2 className="proposal-form__section-title">Project Details</h2>
+            <p className="proposal-form__section-desc">
+              Optional context that sharpens the proposal's technical and business specificity.
+            </p>
+          </div>
+        </div>
+
+        <div className="proposal-form__fields proposal-form__fields--grid">
+          <FormField
+            label="Project Type"
+            name="project_type"
+            as="select"
+            value={form.project_type}
+            onChange={updateField}
+            options={PROJECT_TYPES}
+          />
+
+          <FormField
+            label="Industry / Domain"
+            name="industry"
+            as="select"
+            value={form.industry}
+            onChange={updateField}
+            options={INDUSTRIES}
+          />
+
+          <FormField
+            label="Timeline"
+            name="timeline"
+            as="select"
+            value={form.timeline}
+            onChange={updateField}
+            options={TIMELINES}
+          />
+
+          <FormField
+            label="Budget Range"
+            name="budget"
+            as="select"
+            value={form.budget}
+            onChange={updateField}
+            options={BUDGETS}
+          />
+        </div>
+      </section>
+
+      {/* ── Section: Client Info ── */}
+      <section className="proposal-form__section">
+        <div className="proposal-form__section-header">
+          <span className="proposal-form__section-num">03</span>
+          <div>
+            <h2 className="proposal-form__section-title">Client Information</h2>
+            <p className="proposal-form__section-desc">
+              Used in the PDF cover page and to personalize the proposal.
+            </p>
+          </div>
+        </div>
+
+        <div className="proposal-form__fields proposal-form__fields--grid">
+          <FormField
+            label="Client / Company Name"
+            name="client_name"
+            as="input"
+            value={form.client_name}
+            onChange={updateField}
+            placeholder="e.g. Acme Corp"
+            hint="Shown on the PDF cover as 'Prepared for:'"
+          />
+
+          <FormField
+            label="Additional Requirements"
+            name="extra_requirements"
+            as="textarea"
+            rows={3}
+            value={form.extra_requirements}
+            onChange={updateField}
+            placeholder="e.g. Must comply with HIPAA, needs offline mode, multilingual support…"
+          />
+        </div>
+      </section>
+
+      {/* ── Error ── */}
+      {error && (
+        <div className="proposal-form__error" role="alert">
+          <span>⚠</span> {error}
+        </div>
+      )}
+
+      {/* ── Submit ── */}
+      <div className="proposal-form__submit">
+        <Button
+          type="submit"
+          size="lg"
+          loading={loading}
+          disabled={!form.description.trim()}
+        >
+          Generate Proposal
+        </Button>
+        <p className="proposal-form__submit-note">
+          Generation takes ~30 – 60 seconds. Each section is crafted individually by AI.
+        </p>
+      </div>
+    </form>
+  );
+}
