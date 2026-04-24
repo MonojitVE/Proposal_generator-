@@ -128,17 +128,15 @@ Use the following structured guidance:
     return call_llm(prompt)
 
 
-def generate_time_budget(previous_output: str) -> str:
-    prompt = f"""
-{master_prompt}
+def generate_time_budget(user_phases: str = "", user_timeline: str = "", user_resources: str = "") -> str:
+    phases  = user_phases    or "1"
+    timeline = user_timeline or "To be confirmed"
+    resources = user_resources or "To be confirmed"
 
-Previous Content:
-{previous_output}
+    return f"""9 TIME AND BUDGET ESTIMATE
 
-Generate ONLY section:
-9 TIME AND BUDGET ESTIMATE
+The entire requirement will be completed in {phases} phase(s) and the Ballpark estimate will be {timeline} (Full Time).
 
-Use the following structured guidance:
-{time_budget_prompt}
-"""
-    return call_llm(prompt)
+TOTAL PROJECT TIME: Ballpark estimation will be {timeline} using technologies mentioned, which may vary depending upon the actual complexity and requirements. This duration is based on functionality mentioned in the document.
+
+NO. OF RESOURCES REQUIRED: {resources}"""

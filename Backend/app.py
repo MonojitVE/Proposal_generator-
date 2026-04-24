@@ -4,20 +4,27 @@ sys.path.insert(0, os.path.dirname(__file__))
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from pipeline import generate_proposal
 from pdf_generator import create_proposal_pdf
 import io
+import uvicorn
 
 app = FastAPI(title="Proposal Generator API")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:3000"],
+    allow_origins=["*"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Serve static frontend files
+STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
+if os.path.exists(STATIC_DIR):
+    app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 
 class ProposalRequest(BaseModel):
@@ -26,6 +33,8 @@ class ProposalRequest(BaseModel):
     industry: str = ""
     timeline: str = ""
     budget: str = ""
+    phases: str = ""
+    resources: str = ""
     client_name: str = ""
     extra_requirements: str = ""
 
@@ -36,6 +45,9 @@ class ProposalResponse(BaseModel):
 
 @app.get("/")
 def root():
+    index_path = os.path.join(STATIC_DIR, "index.html")
+    if os.path.exists(index_path):
+        return FileResponse(index_path)
     return {"status": "Proposal Generator API is running"}
 
 
@@ -44,18 +56,23 @@ def generate(req: ProposalRequest):
     if not req.description.strip():
         raise HTTPException(status_code=400, detail="Project description is required.")
 
+    # timeline and budget are passed separately — NOT fed to the LLM
     enriched_input = f"""
 Project Description: {req.description}
 {f"Project Type: {req.project_type}" if req.project_type else ""}
 {f"Industry/Domain: {req.industry}" if req.industry else ""}
-{f"Timeline: {req.timeline}" if req.timeline else ""}
-{f"Budget: {req.budget}" if req.budget else ""}
 {f"Client/Company: {req.client_name}" if req.client_name else ""}
 {f"Additional Requirements: {req.extra_requirements}" if req.extra_requirements else ""}
 """.strip()
 
     try:
-        proposal_text = generate_proposal(enriched_input)
+        proposal_text = generate_proposal(
+            enriched_input,
+            user_timeline=req.timeline,
+            user_budget=req.budget,
+            user_phases=req.phases,
+            user_resources=req.resources,
+        )
         return ProposalResponse(proposal_text=proposal_text)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -75,3 +92,7 @@ def download_pdf(req: ProposalResponse):
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+if __name__ == "__main__":
+    uvicorn.run("app:app", host="0.0.0.0", port=8000, reload=True)
