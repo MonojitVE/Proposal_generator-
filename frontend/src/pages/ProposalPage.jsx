@@ -25,23 +25,16 @@ export default function ProposalPage() {
   const [copied, setCopied] = useState(false);
   const [pdfError, setPdfError] = useState("");
 
-  // Redirect if landed here without state
   useEffect(() => {
     if (!initialText) navigate("/generate", { replace: true });
   }, [initialText, navigate]);
 
-  /* ── Actions ── */
   const handleDownloadPdf = useCallback(async () => {
     setPdfLoading(true);
     setPdfError("");
     try {
-      // Derive project title from first non-empty line of proposal
-      const firstLine =
-        proposalText.split("\n").find((l) => l.trim()) || "Project Proposal";
-
       const blob = await generateProposalPdf(proposalText, {
-        projectTitle:
-          firstLine.replace(/^\d+\s+/, "").trim() || "Project Proposal",
+        projectTitle: formData?.project_name || "Project Proposal", // ← from form field
         preparedBy: "Virtual Employee",
         clientName: clientName || "",
         date: new Date().toLocaleDateString("en-GB", {
@@ -60,7 +53,7 @@ export default function ProposalPage() {
     } finally {
       setPdfLoading(false);
     }
-  }, [proposalText, clientName]);
+  }, [proposalText, clientName, formData]);
 
   const handleCopy = useCallback(async () => {
     try {
@@ -80,7 +73,7 @@ export default function ProposalPage() {
   }, [proposalText]);
 
   const handleEditToggle = () => {
-    if (editMode) setEditDraft(proposalText); // cancel → reset draft
+    if (editMode) setEditDraft(proposalText);
     setEditMode((e) => !e);
   };
 
@@ -98,7 +91,7 @@ export default function ProposalPage() {
   return (
     <PageShell>
       <div className="proposal-page">
-        {/* ── Breadcrumb ── */}
+        {/* Breadcrumb */}
         <div className="proposal-page__breadcrumb">
           <button
             className="proposal-page__back"
@@ -112,7 +105,7 @@ export default function ProposalPage() {
           </span>
         </div>
 
-        {/* ── Toolbar ── */}
+        {/* Toolbar */}
         <ProposalToolbar
           onDownloadPdf={handleDownloadPdf}
           onRegenerate={handleRegenerate}
@@ -129,9 +122,9 @@ export default function ProposalPage() {
           </div>
         )}
 
-        {/* ── Content ── */}
+        {/* Content */}
         <div className="proposal-page__body">
-          {/* ── Table of Contents (sidebar) ── */}
+          {/* TOC sidebar */}
           <aside className="proposal-page__toc">
             <p className="proposal-page__toc-label">Contents</p>
             {[
@@ -158,7 +151,7 @@ export default function ProposalPage() {
             ))}
           </aside>
 
-          {/* ── Editor / Viewer ── */}
+          {/* Editor / Viewer */}
           <div className="proposal-page__doc">
             {editMode ? (
               <div className="proposal-page__editor-wrap">

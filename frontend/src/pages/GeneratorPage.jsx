@@ -10,27 +10,22 @@ export default function GeneratorPage() {
   const navigate = useNavigate();
   const proposal = useProposal();
 
-  // ✅ Navigate only after render, never during it
   useEffect(() => {
     if (proposal.status === "done" && proposal.proposalText) {
       navigate("/proposal", {
         state: {
           proposalText: proposal.proposalText,
           clientName: proposal.form.client_name,
-          formData: proposal.form,
+          formData: proposal.form, // ← includes project_name
         },
       });
     }
   }, [proposal.status, proposal.proposalText]);
 
-  const handleGenerate = async () => {
-    await proposal.generate();
-  };
-
   return (
     <PageShell>
       <div className="gen-page">
-        {/* ── Sidebar ── */}
+        {/* Sidebar */}
         <aside className="gen-page__sidebar">
           <div className="gen-page__sidebar-sticky">
             <h1 className="gen-page__title">New Proposal</h1>
@@ -83,7 +78,7 @@ export default function GeneratorPage() {
           </div>
         </aside>
 
-        {/* ── Main content ── */}
+        {/* Main content */}
         <main className="gen-page__main">
           {proposal.status === "generating" ? (
             <GenerationLoader
@@ -95,7 +90,7 @@ export default function GeneratorPage() {
               <ProposalForm
                 form={proposal.form}
                 updateField={proposal.updateField}
-                onSubmit={handleGenerate}
+                onSubmit={proposal.generate}
                 loading={proposal.status === "generating"}
                 error={proposal.error}
               />

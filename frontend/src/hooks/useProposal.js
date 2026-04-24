@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
-import { generateProposal, triggerDownload } from "../services/api";
-import { generateProposalPdf } from "../services/pdfGenerator";
+import { generateProposal } from "../services/api";
+import { parseProposalText } from "../services/proposalParser";
 
 const INITIAL_FORM = {
   project_name: "",
@@ -36,9 +36,6 @@ export function useProposal() {
   const [stepIndex, setStepIndex] = useState(0);
   const [pdfLoading, setPdfLoading] = useState(false);
 
-  // ← Snapshot of form saved at generation time, survives page transitions
-  const [savedMeta, setSavedMeta] = useState({ project_name: "", client_name: "" });
-
   const updateField = useCallback((field, value) => {
     setForm((f) => ({ ...f, [field]: value }));
   }, []);
@@ -49,23 +46,21 @@ export function useProposal() {
     setStatus("idle");
     setError("");
     setStepIndex(0);
-    setSavedMeta({ project_name: "", client_name: "" });
   }, []);
 
   const generate = useCallback(async () => {
+    if (!form.project_name.trim()) {
+      setError("Project name is required.");
+      return;
+    }
     if (!form.description.trim()) {
       setError("Project description is required.");
       return;
     }
+
     setStatus("generating");
     setError("");
     setStepIndex(0);
-
-    // ← Save project_name and client_name NOW before any navigation/reset
-    setSavedMeta({
-      project_name: form.project_name.trim(),
-      client_name: form.client_name.trim(),
-    });
 
     const totalSteps = GENERATION_STEPS.length;
     let current = 0;
@@ -75,54 +70,34 @@ export function useProposal() {
     }, 3200);
 
     try {
-      const text = await generateProposal(form);
+      const rawText = await generateProposal(form);
+
+      // ── Parse out any embedded JSON blocks into clean plain text ──────────
+      const cleanText = parseProposalText(rawText);
+
       clearInterval(interval);
-      if (!text || typeof text !== "string") throw new Error("Invalid response from proposal generator");
       setStepIndex(totalSteps - 1);
       await new Promise((r) => setTimeout(r, 600));
-      setProposalText(text);
+      setProposalText(cleanText);
       setStatus("done");
     } catch (e) {
       clearInterval(interval);
-      console.error("GENERATION ERROR:", e);
-      setError(e?.response?.data?.message || e.message || "Something went wrong. Please try again.");
+      setError(e.message || "Something went wrong. Please try again.");
       setStatus("error");
     }
   }, [form]);
 
-  const downloadPdf = useCallback(async () => {
-    if (pdfLoading) return;
-    if (!proposalText) { setError("No proposal available to download."); return; }
-    setPdfLoading(true);
-    setError("");
-
-    try {
-      const blob = await generateProposalPdf(proposalText, {
-        projectTitle: savedMeta.project_name,   // ← uses saved snapshot, never empty
-        preparedBy: "Virtual Employee Pvt. Ltd.",
-        clientName: savedMeta.client_name || "",
-        date: "",
-      });
-
-      if (!blob || !(blob instanceof Blob)) throw new Error("Invalid PDF response");
-
-      const clientSlug = savedMeta.client_name
-        ? savedMeta.client_name.replace(/\s+/g, "_").toLowerCase()
-        : "proposal";
-      triggerDownload(blob, `${clientSlug}_proposal.pdf`);
-    } catch (e) {
-      console.error("PDF ERROR:", e);
-      setError(e?.response?.data?.message || e.message || "PDF download failed. Please try again.");
-    } finally {
-      setPdfLoading(false);
-    }
-  }, [proposalText, savedMeta, pdfLoading]);
-
   return {
-    form, updateField, resetForm,
-    proposalText, setProposalText,
-    status, error, stepIndex,
+    form,
+    updateField,
+    resetForm,
+    proposalText,
+    setProposalText,
+    status,
+    error,
+    stepIndex,
     steps: GENERATION_STEPS,
-    generate, downloadPdf, pdfLoading,
+    generate,
+    pdfLoading,
   };
 }
