@@ -43,7 +43,15 @@ def generate_proposal(
         Complete formatted proposal as plain text.
     """
 
-    base = f"{contents}\n\n{company_overview}"
+    base = f"""{contents}\n\n{company_overview}
+
+    IMPORTANT:
+You MUST strictly follow the USER REQUIREMENTS below.
+Do NOT assume any domain unless specified.
+
+    USER REQUIREMENTS:
+{user_input}
+"""
 
     # ── Section 4: Objectives ────────────────────────────────────────────────
     print("Generating: Objectives...")

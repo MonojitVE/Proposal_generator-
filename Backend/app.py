@@ -22,32 +22,39 @@ app.add_middleware(
 )
 
 # Serve static frontend files
-STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
-if os.path.exists(STATIC_DIR):
-    app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+# STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
+# if os.path.exists(STATIC_DIR):
+#     app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 
 class ProposalRequest(BaseModel):
+    # description: str
+    # project_type: str = ""
+    # industry: str = ""
+    # timeline: str = ""
+    # budget: str = ""
+    # phases: str = ""
+    # resources: str = ""
+    # client_name: str = ""
+    # extra_requirements: str = ""
     description: str
-    project_type: str = ""
-    industry: str = ""
-    timeline: str = ""
-    budget: str = ""
-    phases: str = ""
-    resources: str = ""
-    client_name: str = ""
-    extra_requirements: str = ""
+    project_type: str
+    industry: str
+    timeline: str
+    budget: str
+    phases: str
+    resources: str
 
 
 class ProposalResponse(BaseModel):
     proposal_text: str
 
 
-@app.get("/")
+@app.get("/health")
 def root():
-    index_path = os.path.join(STATIC_DIR, "index.html")
-    if os.path.exists(index_path):
-        return FileResponse(index_path)
+    # index_path = os.path.join(STATIC_DIR, "index.html")
+    # if os.path.exists(index_path):
+    #     return FileResponse(index_path)
     return {"status": "Proposal Generator API is running"}
 
 
@@ -58,12 +65,20 @@ def generate(req: ProposalRequest):
 
     # timeline and budget are passed separately — NOT fed to the LLM
     enriched_input = f"""
-Project Description: {req.description}
+ Project Description: {req.description}
 {f"Project Type: {req.project_type}" if req.project_type else ""}
 {f"Industry/Domain: {req.industry}" if req.industry else ""}
-{f"Client/Company: {req.client_name}" if req.client_name else ""}
-{f"Additional Requirements: {req.extra_requirements}" if req.extra_requirements else ""}
+{f"TimeLine: {req.timeline}" if req.timeline else ""}
+{f"Budget: {req.budget}" if req.budget else ""}
+{f"Phases: {req.phases}" if req.phases else ""}
+{f"Resources: {req.resources}" if req.resources else ""}
 """.strip()
+
+
+
+# {f"Client/Company: {req.client_name}" if req.client_name else ""}
+# {f"Additional Requirements: {req.extra_requirements}" if req.extra_requirements else ""}
+# """.strip()
 
     try:
         proposal_text = generate_proposal(
@@ -78,20 +93,20 @@ Project Description: {req.description}
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.post("/download-pdf")
-def download_pdf(req: ProposalResponse):
-    if not req.proposal_text.strip():
-        raise HTTPException(status_code=400, detail="Proposal text is required.")
+# @app.post("/download-pdf")
+# def download_pdf(req: ProposalResponse):
+#     if not req.proposal_text.strip():
+#         raise HTTPException(status_code=400, detail="Proposal text is required.")
 
-    try:
-        pdf_bytes = create_proposal_pdf(req.proposal_text)
-        return StreamingResponse(
-            io.BytesIO(pdf_bytes),
-            media_type="application/pdf",
-            headers={"Content-Disposition": "attachment; filename=proposal.pdf"}
-        )
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+#     try:
+#         pdf_bytes = create_proposal_pdf(req.proposal_text)
+#         return StreamingResponse(
+#             io.BytesIO(pdf_bytes),
+#             media_type="application/pdf",
+#             headers={"Content-Disposition": "attachment; filename=proposal.pdf"}
+#         )
+#     except Exception as e:
+#         raise HTTPException(status_code=500, detail=str(e))
 
 
 if __name__ == "__main__":
