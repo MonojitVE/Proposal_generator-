@@ -1,24 +1,21 @@
 d_purposeofdocument_prompts = {
 
-    "project_name": "Extract or generate a suitable project/product name based on the user's input. Keep it concise and professional.",
+    "purpose_of_document": """
+Generate a single well-structured paragraph explaining the purpose of the document.
 
-    "project_type": "Identify the type of solution (e.g., AI system, POS platform, e-commerce website, SaaS platform, mobile app, internal tool). Keep it short.",
+Guidelines:
+- Clearly describe what the project/proposal is about
+- Mention the overall goal or problem being solved
+- Briefly include scope and key capabilities (high-level only)
+- Optionally reference technology or implementation approach if relevant
+- Ensure it reflects clarity, alignment, and collaboration among stakeholders
+- Keep it concise, professional, and client-ready
 
-    "primary_problem_or_goal": "Summarize the main problem being solved or the primary goal of the project in one clear sentence.",
-
-    "scope_description": "Describe the scope, objectives, and key capabilities of the system in 2–3 lines based on the project context.",
-
-    "technical_overview": "If the project is technical, describe architecture, stack, and integrations. If not, describe the implementation approach at a high level.",
-
-    "stakeholder_alignment": "Write a paragraph explaining that the document ensures clarity and alignment among stakeholders on scope, approach, expectations, and constraints.",
-
-    "deliverables_points": "Generate bullet points covering scope, approach, performance (if relevant), timeline, and constraints. Skip any that are not applicable.",
-
-    "execution_reference": "Write a statement explaining that the document serves as a baseline reference for execution, validation, and acceptance.",
-
-    "future_scope_examples": "Suggest future enhancements only if applicable (e.g., scaling, integrations, AI features, automation). Otherwise, keep it minimal or generic.",
-
-    "final_paragraph": "Generate a closing statement highlighting scalability, flexibility, or maintainability depending on the project type."
+Output:
+- Return ONLY one paragraph
+- Do NOT use bullet points
+- Do NOT add headings or extra sections
+"""
 }
 
 

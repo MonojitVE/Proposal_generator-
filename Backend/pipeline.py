@@ -155,6 +155,7 @@ def generate_proposal(
 
 {company_overview}
 
+2 PURPOSE OF THE DOCUMENT
 {purpose_output}
 
 3 KEY DELIVERABLES
