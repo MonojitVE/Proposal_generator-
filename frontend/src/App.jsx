@@ -1,8 +1,8 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import HomePage from './pages/HomePage';
-import GeneratorPage from './pages/GeneratorPage';
-import ProposalPage from './pages/ProposalPage';
-import './styles/global.css';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import HomePage from "./pages/HomePage";
+import GeneratorPage from "./pages/GeneratorPage";
+import ProposalPage from "./pages/ProposalPage";
+import "./styles/global.css";
 
 export default function App() {
   return (

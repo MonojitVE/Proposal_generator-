@@ -1,42 +1,62 @@
-import { useState, useCallback, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import PageShell from '../components/layout/PageShell';
-import ProposalToolbar from '../components/proposal/ProposalToolbar';
-import ProposalViewer from '../components/proposal/ProposalViewer';
-import Button from '../components/ui/Button';
-import { downloadProposalPdf, triggerDownload } from '../services/api';
-import './ProposalPage.css';
+import { useState, useCallback, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import PageShell from "../components/layout/PageShell";
+import ProposalToolbar from "../components/proposal/ProposalToolbar";
+import ProposalViewer from "../components/proposal/ProposalViewer";
+import Button from "../components/ui/Button";
+import { triggerDownload } from "../services/api";
+import { generateProposalPdf } from "../services/pdfGenerator";
+import "./ProposalPage.css";
 
 export default function ProposalPage() {
-  const location  = useLocation();
-  const navigate  = useNavigate();
+  const location = useLocation();
+  const navigate = useNavigate();
 
-  const { proposalText: initialText, clientName, formData } = location.state || {};
+  const {
+    proposalText: initialText,
+    clientName,
+    formData,
+  } = location.state || {};
 
-  const [proposalText, setProposalText] = useState(initialText || '');
-  const [editMode,     setEditMode]     = useState(false);
-  const [editDraft,    setEditDraft]    = useState(initialText || '');
-  const [pdfLoading,   setPdfLoading]   = useState(false);
-  const [copied,       setCopied]       = useState(false);
-  const [pdfError,     setPdfError]     = useState('');
+  const [proposalText, setProposalText] = useState(initialText || "");
+  const [editMode, setEditMode] = useState(false);
+  const [editDraft, setEditDraft] = useState(initialText || "");
+  const [pdfLoading, setPdfLoading] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [pdfError, setPdfError] = useState("");
 
   // Redirect if landed here without state
   useEffect(() => {
-    if (!initialText) navigate('/generate', { replace: true });
+    if (!initialText) navigate("/generate", { replace: true });
   }, [initialText, navigate]);
 
   /* ── Actions ── */
   const handleDownloadPdf = useCallback(async () => {
     setPdfLoading(true);
-    setPdfError('');
+    setPdfError("");
     try {
-      const blob = await downloadProposalPdf(proposalText);
+      // Derive project title from first non-empty line of proposal
+      const firstLine =
+        proposalText.split("\n").find((l) => l.trim()) || "Project Proposal";
+
+      const blob = await generateProposalPdf(proposalText, {
+        projectTitle:
+          firstLine.replace(/^\d+\s+/, "").trim() || "Project Proposal",
+        preparedBy: "Virtual Employee",
+        clientName: clientName || "",
+        date: new Date().toLocaleDateString("en-GB", {
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+        }),
+      });
+
       const slug = clientName
-        ? clientName.replace(/\s+/g, '_').toLowerCase()
-        : 'proposal';
+        ? clientName.replace(/\s+/g, "_").toLowerCase()
+        : "proposal";
       triggerDownload(blob, `${slug}_proposal.pdf`);
     } catch (e) {
-      setPdfError(e.message || 'PDF download failed.');
+      setPdfError(e.message || "PDF generation failed.");
     } finally {
       setPdfLoading(false);
     }
@@ -48,12 +68,11 @@ export default function ProposalPage() {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      // Fallback for older browsers
-      const ta = document.createElement('textarea');
+      const ta = document.createElement("textarea");
       ta.value = proposalText;
       document.body.appendChild(ta);
       ta.select();
-      document.execCommand('copy');
+      document.execCommand("copy");
       document.body.removeChild(ta);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
@@ -61,11 +80,8 @@ export default function ProposalPage() {
   }, [proposalText]);
 
   const handleEditToggle = () => {
-    if (editMode) {
-      // Cancel — reset draft
-      setEditDraft(proposalText);
-    }
-    setEditMode(e => !e);
+    if (editMode) setEditDraft(proposalText); // cancel → reset draft
+    setEditMode((e) => !e);
   };
 
   const handleSaveEdit = () => {
@@ -74,7 +90,7 @@ export default function ProposalPage() {
   };
 
   const handleRegenerate = () => {
-    navigate('/generate', { state: { prefill: formData } });
+    navigate("/generate", { state: { prefill: formData } });
   };
 
   if (!initialText) return null;
@@ -82,18 +98,17 @@ export default function ProposalPage() {
   return (
     <PageShell>
       <div className="proposal-page">
-
         {/* ── Breadcrumb ── */}
         <div className="proposal-page__breadcrumb">
           <button
             className="proposal-page__back"
-            onClick={() => navigate('/generate')}
+            onClick={() => navigate("/generate")}
           >
             ← New Proposal
           </button>
           <span className="proposal-page__breadcrumb-sep">/</span>
           <span className="proposal-page__breadcrumb-current">
-            {clientName ? `${clientName} — Proposal` : 'Generated Proposal'}
+            {clientName ? `${clientName} — Proposal` : "Generated Proposal"}
           </span>
         </div>
 
@@ -116,20 +131,19 @@ export default function ProposalPage() {
 
         {/* ── Content ── */}
         <div className="proposal-page__body">
-
           {/* ── Table of Contents (sidebar) ── */}
           <aside className="proposal-page__toc">
             <p className="proposal-page__toc-label">Contents</p>
             {[
-              'Company Overview',
-              'Purpose of Document',
-              'Key Deliverables',
-              'Objectives',
-              'Features & Functionality',
-              'Technical Approach',
-              'Technology Stack',
-              'Future Scope',
-              'Time & Budget Estimate',
+              "Company Overview",
+              "Purpose of Document",
+              "Key Deliverables",
+              "Objectives",
+              "Features & Functionality",
+              "Technical Approach",
+              "Technology Stack",
+              "Future Scope",
+              "Time & Budget Estimate",
             ].map((s, i) => (
               <a
                 key={s}
@@ -137,7 +151,7 @@ export default function ProposalPage() {
                 className="proposal-page__toc-item"
               >
                 <span className="proposal-page__toc-num">
-                  {String(i + 1).padStart(2, '0')}
+                  {String(i + 1).padStart(2, "0")}
                 </span>
                 {s}
               </a>
@@ -153,10 +167,18 @@ export default function ProposalPage() {
                     ✏ Edit Mode — changes apply to PDF download
                   </span>
                   <div className="proposal-page__editor-actions">
-                    <Button variant="ghost" size="sm" onClick={handleEditToggle}>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleEditToggle}
+                    >
                       Cancel
                     </Button>
-                    <Button variant="primary" size="sm" onClick={handleSaveEdit}>
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      onClick={handleSaveEdit}
+                    >
                       Save Changes
                     </Button>
                   </div>
@@ -164,7 +186,7 @@ export default function ProposalPage() {
                 <textarea
                   className="proposal-page__editor"
                   value={editDraft}
-                  onChange={e => setEditDraft(e.target.value)}
+                  onChange={(e) => setEditDraft(e.target.value)}
                   spellCheck={false}
                   aria-label="Edit proposal text"
                 />
@@ -175,7 +197,6 @@ export default function ProposalPage() {
               </div>
             )}
           </div>
-
         </div>
       </div>
     </PageShell>

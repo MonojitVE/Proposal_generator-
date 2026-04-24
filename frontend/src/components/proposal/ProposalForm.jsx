@@ -1,51 +1,57 @@
-import FormField from '../ui/FormField';
-import Button from '../ui/Button';
-import './ProposalForm.css';
+import FormField from "../ui/FormField";
+import Button from "../ui/Button";
+import "./ProposalForm.css";
 
 const PROJECT_TYPES = [
-  { value: 'web_app', label: 'Web Application' },
-  { value: 'mobile_app', label: 'Mobile Application' },
-  { value: 'api', label: 'API / Backend Service' },
-  { value: 'data_platform', label: 'Data Platform / Analytics' },
-  { value: 'ai_ml', label: 'AI / Machine Learning' },
-  { value: 'ecommerce', label: 'E-Commerce Platform' },
-  { value: 'crm', label: 'CRM / ERP System' },
-  { value: 'saas', label: 'SaaS Product' },
-  { value: 'other', label: 'Other' },
+  { value: "web_app", label: "Web Application" },
+  { value: "mobile_app", label: "Mobile Application" },
+  { value: "api", label: "API / Backend Service" },
+  { value: "data_platform", label: "Data Platform / Analytics" },
+  { value: "ai_ml", label: "AI / Machine Learning" },
+  { value: "ecommerce", label: "E-Commerce Platform" },
+  { value: "crm", label: "CRM / ERP System" },
+  { value: "saas", label: "SaaS Product" },
+  { value: "other", label: "Other" },
 ];
 
 const INDUSTRIES = [
-  { value: 'healthcare', label: 'Healthcare' },
-  { value: 'fintech', label: 'FinTech / Finance' },
-  { value: 'edtech', label: 'EdTech / Education' },
-  { value: 'ecommerce', label: 'E-Commerce / Retail' },
-  { value: 'logistics', label: 'Logistics / Supply Chain' },
-  { value: 'real_estate', label: 'Real Estate' },
-  { value: 'legal', label: 'Legal / Compliance' },
-  { value: 'manufacturing', label: 'Manufacturing' },
-  { value: 'media', label: 'Media / Entertainment' },
-  { value: 'government', label: 'Government / Public Sector' },
-  { value: 'other', label: 'Other' },
+  { value: "healthcare", label: "Healthcare" },
+  { value: "fintech", label: "FinTech / Finance" },
+  { value: "edtech", label: "EdTech / Education" },
+  { value: "ecommerce", label: "E-Commerce / Retail" },
+  { value: "logistics", label: "Logistics / Supply Chain" },
+  { value: "real_estate", label: "Real Estate" },
+  { value: "legal", label: "Legal / Compliance" },
+  { value: "manufacturing", label: "Manufacturing" },
+  { value: "media", label: "Media / Entertainment" },
+  { value: "government", label: "Government / Public Sector" },
+  { value: "other", label: "Other" },
 ];
 
 const TIMELINES = [
-  { value: '1_month', label: '< 1 Month' },
-  { value: '1_3_months', label: '1 – 3 Months' },
-  { value: '3_6_months', label: '3 – 6 Months' },
-  { value: '6_12_months', label: '6 – 12 Months' },
-  { value: '12_plus', label: '12+ Months' },
+  { value: "1_month", label: "< 1 Month" },
+  { value: "1_3_months", label: "1 – 3 Months" },
+  { value: "3_6_months", label: "3 – 6 Months" },
+  { value: "6_12_months", label: "6 – 12 Months" },
+  { value: "12_plus", label: "12+ Months" },
 ];
 
 const BUDGETS = [
-  { value: 'under_10k', label: 'Under $10,000' },
-  { value: '10k_25k', label: '$10,000 – $25,000' },
-  { value: '25k_50k', label: '$25,000 – $50,000' },
-  { value: '50k_100k', label: '$50,000 – $100,000' },
-  { value: '100k_plus', label: '$100,000+' },
-  { value: 'flexible', label: 'Flexible / TBD' },
+  { value: "under_10k", label: "Under $10,000" },
+  { value: "10k_25k", label: "$10,000 – $25,000" },
+  { value: "25k_50k", label: "$25,000 – $50,000" },
+  { value: "50k_100k", label: "$50,000 – $100,000" },
+  { value: "100k_plus", label: "$100,000+" },
+  { value: "flexible", label: "Flexible / TBD" },
 ];
 
-export default function ProposalForm({ form, updateField, onSubmit, loading, error }) {
+export default function ProposalForm({
+  form,
+  updateField,
+  onSubmit,
+  loading,
+  error,
+}) {
   const handleSubmit = (e) => {
     e.preventDefault();
     onSubmit();
@@ -53,14 +59,15 @@ export default function ProposalForm({ form, updateField, onSubmit, loading, err
 
   return (
     <form className="proposal-form" onSubmit={handleSubmit} noValidate>
-      {/* ── Section: Project Brief ── */}
+      {/* ── Section 01: Project Brief ── */}
       <section className="proposal-form__section">
         <div className="proposal-form__section-header">
           <span className="proposal-form__section-num">01</span>
           <div>
             <h2 className="proposal-form__section-title">Project Brief</h2>
             <p className="proposal-form__section-desc">
-              Describe what you're building — the more detail, the better the proposal.
+              Describe what you're building — the more detail, the better the
+              proposal.
             </p>
           </div>
         </div>
@@ -80,14 +87,15 @@ export default function ProposalForm({ form, updateField, onSubmit, loading, err
         </div>
       </section>
 
-      {/* ── Section: Project Details ── */}
+      {/* ── Section 02: Project Details ── */}
       <section className="proposal-form__section">
         <div className="proposal-form__section-header">
           <span className="proposal-form__section-num">02</span>
           <div>
             <h2 className="proposal-form__section-title">Project Details</h2>
             <p className="proposal-form__section-desc">
-              Optional context that sharpens the proposal's technical and business specificity.
+              Optional context that sharpens the proposal's technical and
+              business specificity.
             </p>
           </div>
         </div>
@@ -131,10 +139,48 @@ export default function ProposalForm({ form, updateField, onSubmit, loading, err
         </div>
       </section>
 
-      {/* ── Section: Client Info ── */}
+      {/* ── Section 03: Execution Details ── */}
       <section className="proposal-form__section">
         <div className="proposal-form__section-header">
           <span className="proposal-form__section-num">03</span>
+          <div>
+            <h2 className="proposal-form__section-title">Execution Details</h2>
+            <p className="proposal-form__section-desc">
+              Help the AI understand how the project will be structured and
+              staffed.
+            </p>
+          </div>
+        </div>
+
+        <div className="proposal-form__fields">
+          <FormField
+            label="Project Phases"
+            name="phases"
+            as="textarea"
+            rows={3}
+            value={form.phases}
+            onChange={updateField}
+            placeholder="e.g. Phase 1: Discovery & Design (2 weeks) → Phase 2: Core Development (6 weeks) → Phase 3: QA & Launch (2 weeks)"
+            hint="Describe the breakdown of work stages if known."
+          />
+
+          <FormField
+            label="Team & Resources"
+            name="resources"
+            as="textarea"
+            rows={3}
+            value={form.resources}
+            onChange={updateField}
+            placeholder="e.g. 1 Project Manager, 2 Backend Engineers, 1 Frontend Engineer, 1 UI/UX Designer, 1 QA Engineer"
+            hint="List the roles or team structure expected for this project."
+          />
+        </div>
+      </section>
+
+      {/* ── Section 04: Client Information ── */}
+      <section className="proposal-form__section">
+        <div className="proposal-form__section-header">
+          <span className="proposal-form__section-num">04</span>
           <div>
             <h2 className="proposal-form__section-title">Client Information</h2>
             <p className="proposal-form__section-desc">
@@ -184,7 +230,8 @@ export default function ProposalForm({ form, updateField, onSubmit, loading, err
           Generate Proposal
         </Button>
         <p className="proposal-form__submit-note">
-          Generation takes ~30 – 60 seconds. Each section is crafted individually by AI.
+          Generation takes ~30 – 60 seconds. Each section is crafted
+          individually by AI.
         </p>
       </div>
     </form>

@@ -1,4 +1,4 @@
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 /**
  * Generate a proposal from form data.
@@ -7,8 +7,8 @@ const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
  */
 export async function generateProposal(formData) {
   const res = await fetch(`${BASE_URL}/generate`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(formData),
   });
 
@@ -22,15 +22,15 @@ export async function generateProposal(formData) {
 }
 
 /**
- * Download a PDF of the proposal.
+ * Generate and download proposal PDF from backend
  * @param {string} proposalText
  * @returns {Promise<Blob>}
  */
 export async function downloadProposalPdf(proposalText) {
-  const res = await fetch(`${BASE_URL}/download-pdf`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ proposal_text: proposalText }),
+  const res = await fetch(`${BASE_URL}/generate-pdf`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ text: proposalText }),
   });
 
   if (!res.ok) {
@@ -38,7 +38,8 @@ export async function downloadProposalPdf(proposalText) {
     throw new Error(err.detail || `Server error ${res.status}`);
   }
 
-  return res.blob();
+  const blob = await res.blob();
+  return blob;
 }
 
 /**
@@ -46,9 +47,9 @@ export async function downloadProposalPdf(proposalText) {
  * @param {Blob} blob
  * @param {string} filename
  */
-export function triggerDownload(blob, filename = 'proposal.pdf') {
+export function triggerDownload(blob, filename = "proposal.pdf") {
   const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
+  const a = document.createElement("a");
   a.href = url;
   a.download = filename;
   document.body.appendChild(a);
