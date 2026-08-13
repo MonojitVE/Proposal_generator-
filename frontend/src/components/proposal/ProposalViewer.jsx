@@ -4,19 +4,21 @@ import './ProposalViewer.css';
 // Section headings the backend produces (mirrors pdf_generator.py SECTION_HEADING_RE)
 const HEADING_PATTERNS = [
   /^\d+\s+[A-Z][A-Z\s&/]+$/,
-  /^CONTENTS$/,
-  /^COMPANY OVERVIEW$/,
-  /^PURPOSE OF THE DOCUMENT$/,
-  /^KEY DELIVERABLES$/,
-  /^OBJECTIVES$/,
-  /^FEATURES AND FUNCTIONALITY$/,
-  /^TECHNICAL APPROACH$/,
-  /^TECHNOLOGY STACK$/,
-  /^FUTURE SCOPE$/,
-  /^TIME AND BUDGET ESTIMATE$/,
+  /^CONTENTS$/i,
+  /^COMPANY OVERVIEW$/i,
+  /^PURPOSE OF THE DOCUMENT$/i,
+  /^KEY DELIVERABLES$/i,
+  /^OBJECTIVES$/i,
+  /^FEATURES AND FUNCTIONALITY$/i,
+  /^TECHNICAL APPROACH$/i,
+  /^TECHNOLOGY STACK$/i,
+  /^FUTURE SCOPE$/i,
+  /^TIME AND BUDGET ESTIMATE$/i,
+  /^PURPOSE$/i,
+  /^DELIVERABLES$/i,
 ];
 
-const SUBSECTION_RE = /^(Frontend|Backend|Database|Architecture|Integrations|Security|DevOps|Workflow|Overview|Timeline|Phases|Budget|Other Tools):\s*/;
+const SUBSECTION_RE = /^(Frontend|Backend|Database|Architecture|Integrations|Security|DevOps|Workflow|Overview|Timeline|Phases|Budget|Other Tools|System Architecture|Testing|Deployment|Monitoring|Authentication|Requirement Analysis|Post[- ]?Launch|Infrastructure|Caching|Real[- ]?Time|Offline|Storage|AI|Automation|Scalability|Performance|Error Handling):\s*/i;
 const NUMBERED_RE   = /^\d+[\.\)]\s+.+|^\d+\.\d+[\.\)]?\s+.+/;
 const BULLET_RE     = /^[-•*]\s+.+/;
 

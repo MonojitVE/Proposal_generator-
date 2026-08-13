@@ -207,7 +207,8 @@ def build_cover(story, styles, client_name: str, project_title: str, date_str: s
 SECTION_HEADING_RE = re.compile(
     r"^(\d+\s+[A-Z][A-Z\s&/]+|CONTENTS|COMPANY OVERVIEW|PURPOSE OF THE DOCUMENT|"
     r"KEY DELIVERABLES|OBJECTIVES|FEATURES AND FUNCTIONALITY|TECHNICAL APPROACH|"
-    r"TECHNOLOGY STACK|FUTURE SCOPE|TIME AND BUDGET ESTIMATE)$"
+    r"TECHNOLOGY STACK|FUTURE SCOPE|TIME AND BUDGET ESTIMATE|PURPOSE|DELIVERABLES)$",
+    re.IGNORECASE
 )
 NUMBERED_POINT_RE = re.compile(r"^\d+[\.\)]\s+.+|^\d+\.\d+[\.\)]?\s+.+")
 BULLET_RE = re.compile(r"^[-•\*]\s+.+")

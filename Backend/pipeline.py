@@ -169,10 +169,13 @@ Do NOT assume any domain unless specified.
 3 KEY DELIVERABLES
 {deliverables_output}
 
+4 OBJECTIVES
 {objective_output}
 
+5 FEATURES AND FUNCTIONALITY
 {features_output}
 
+6 TECHNICAL APPROACH
 {technical_output}
 
 7 TECHNOLOGY STACK

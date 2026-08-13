@@ -89,14 +89,16 @@ function drawCover(doc, { projectTitle, preparedBy, date }) {
 }
 
 const H1_RE      = /^(\d+)\s+([A-Z][A-Z\s&/,]+)$/;
+const H1_STANDALONE_RE = /^(CONTENTS|COMPANY OVERVIEW|PURPOSE OF THE DOCUMENT|KEY DELIVERABLES|OBJECTIVES|FEATURES AND FUNCTIONALITY|TECHNICAL APPROACH|TECHNOLOGY STACK|FUTURE SCOPE|TIME AND BUDGET ESTIMATE)$/i;
 const BULLET_RE  = /^[-•*]\s+/;
-const SUBHEAD_RE = /^([A-Z][\.\)]\s+.+|\d+[\.\)]\s+[A-Z].+)/;
+const SUBHEAD_RE = /^(Frontend|Backend|Database|Architecture|Integrations|Security|DevOps|Workflow|Overview|Timeline|Phases|Budget|Other Tools|System Architecture|Testing|Deployment|Monitoring|Authentication|Requirement Analysis|Post[- ]?Launch|Infrastructure|Caching|Real[- ]?Time|Offline|Storage|AI|Automation|Scalability|Performance|Error Handling):\s*/i;
 
 function parseLines(text) {
   return text.split("\n").map((raw) => {
     const t = raw.trim();
     if (!t) return { kind: "empty" };
     if (H1_RE.test(t)) { const [,num,title] = t.match(H1_RE); return { kind: "h1", num, title }; }
+    if (H1_STANDALONE_RE.test(t)) return { kind: "h1", num: "", title: t };
     if (BULLET_RE.test(t)) return { kind: "bullet", text: t.replace(/^[-•*]\s+/, "") };
     if (SUBHEAD_RE.test(t)) return { kind: "sub", text: t };
     return { kind: "body", text: t };
@@ -169,7 +171,7 @@ export async function generateProposalPdf(
       case "h1":
         pageBreak(14); y += 5;
         doc.setFontSize(12); doc.setFont("helvetica", "bold"); sc(doc, BLUE);
-        doc.text(`${e.num}  ${e.title}`, ML, y);
+        doc.text(e.num ? `${e.num}  ${e.title}` : e.title, ML, y);
         y += 2; rule(); break;
       case "sub": {
         pageBreak(8); y += 2;

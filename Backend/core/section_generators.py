@@ -160,6 +160,13 @@ SECTION_GUARD = """
 IMPORTANT:
 You are generating ONLY ONE section of a proposal.
 
+OUTPUT FORMAT:
+- Return clean plain text ONLY
+- Do NOT return JSON, code blocks, backticks, or markdown formatting (no **, no ##, no ```)
+- Use bullet points with "- " prefix for unordered lists
+- Use numbered points like "1. " for ordered items
+- For subsections use the format "Label:" on its own line (e.g., "Frontend:", "Backend:")
+
 STRICT RULES:
 - Do NOT generate full proposal
 - Do NOT include:
@@ -207,6 +214,17 @@ Context:
 
 Instructions:
 {key_deliverables_prompt}
+
+CRITICAL FORMAT RULES:
+- Return ONLY a plain text bullet list
+- Each deliverable on its own line starting with "- "
+- Do NOT use JSON, numbered lists, or nested structures
+- Do NOT add any heading or title line
+
+Example output format:
+- User Authentication Module
+- Admin Dashboard
+- Payment Gateway Integration
 """
     return call_llm(prompt)
 
@@ -224,9 +242,17 @@ Context:
 Instructions:
 {d_objective}
 
-Rules:
-- Return ONLY bullet points
-- Do NOT add headings
+CRITICAL FORMAT RULES:
+- Return ONLY a plain text bullet list
+- Each objective on its own line starting with "- "
+- Do NOT use JSON, numbered lists, or nested structures
+- Do NOT add any heading or title line
+- Select only relevant objectives based on the project context
+
+Example output format:
+- Implement secure user authentication and role-based access control
+- Build responsive UI optimized for web and mobile platforms
+- Integrate third-party payment processing
 """
     return call_llm(prompt)
 
@@ -264,34 +290,47 @@ Context:
 Instructions:
 {d_technical_approach_prompts}
 
-Output format MUST be:
+CRITICAL FORMAT RULES:
+- Return clean plain text ONLY (no JSON, no markdown, no code blocks)
+- Use subsection labels on their own line followed by a colon
+- Under each subsection, use bullet points starting with "- "
+- Do NOT add any main heading or title line
+
+Output format MUST be EXACTLY like this:
 
 Overview:
-...
+- High-level explanation of the technical approach
 
 Frontend:
-...
+- Technology and framework choice
+- Key responsibilities
 
 Backend:
-...
+- Architecture and framework
+- API design approach
 
 Database:
-...
+- Database choice and reasoning
+- Data modeling approach
 
 Architecture:
-...
+- System architecture overview
+- Scalability considerations
 
 Integrations:
-...
+- Third-party services
+- API integrations
 
 Security:
-...
+- Authentication approach
+- Data protection
 
 DevOps:
-...
+- Deployment strategy
+- CI/CD approach
 
 Workflow:
-...
+- Step-by-step development flow
 """
     return call_llm(prompt)
 

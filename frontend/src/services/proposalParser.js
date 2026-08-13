@@ -117,6 +117,16 @@ export function parseProposalText(rawText) {
   // Step 2: Normalise excessive blank lines (max 2 in a row)
   cleaned = cleaned.replace(/\n{3,}/g, "\n\n");
 
+  // Step 2.5: Strip markdown formatting that the LLM may still produce
+  // Remove bold markers
+  cleaned = cleaned.replace(/\*\*(.+?)\*\*/g, '$1');
+  // Remove markdown heading prefixes (### Heading → Heading)
+  cleaned = cleaned.replace(/^#{1,4}\s+/gm, '');
+  // Remove code block fences
+  cleaned = cleaned.replace(/```[\s\S]*?```/g, '');
+  // Remove inline backticks
+  cleaned = cleaned.replace(/`([^`]+)`/g, '$1');
+
   // Step 3: Ensure bullet lines start with "- " consistently
   cleaned = cleaned.replace(/^[•*]\s+/gm, "- ");
 

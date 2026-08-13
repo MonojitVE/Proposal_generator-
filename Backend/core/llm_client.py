@@ -11,7 +11,7 @@ def call_llm(prompt: str) -> str:
         messages=[
             {
                 "role": "system",
-                "content": "You generate structured technical proposals in strict JSON format only."
+                "content": "You are an expert technical proposal writer. You generate clean, well-structured plain text content for professional project proposals. Never return JSON, code blocks, or markdown formatting symbols like backticks, bold (**), or headings (#)."
             },
             {
                 "role": "user",
