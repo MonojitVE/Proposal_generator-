@@ -214,63 +214,70 @@ function drawHeader(doc) {
 }
 
 function drawCover(doc, { projectTitle, preparedBy, date, logoDataUrl }) {
-  // 1. The enlarged Logo image placed at the top (branding text removed)
+  // 1. Top-Right Graphic Accent
+  sc(doc, BLUE, "fill");
+  // A sleek triangle in the top right corner
+  doc.triangle(PAGE_W, 0, PAGE_W, 60, PAGE_W - 60, 0, "F");
+
+  // 2. Center the Logo
   if (logoDataUrl) {
-    const logoW = 80;  // Significantly enlarged logo
-    const logoH = 26;  // Maintained aspect ratio
+    const logoW = 80;
+    const logoH = 26;
     const logoX = (PAGE_W - logoW) / 2;
-    doc.addImage(logoDataUrl, 'PNG', logoX, 30, logoW, logoH);
+    doc.addImage(logoDataUrl, 'PNG', logoX, 40, logoW, logoH);
   }
 
-  // 3. PROPOSAL FOR
-  doc.setFontSize(15);
+  // 3. Huge PROPOSAL Typography
+  doc.setFontSize(48);
   doc.setFont("helvetica", "bold");
-  sc(doc, BLUE);
-  const pf = "PROPOSAL FOR";
-  doc.text(pf, (PAGE_W - tw(doc, pf)) / 2, 88);
+  sc(doc, DARK);
+  const propText = "PROPOSAL";
+  doc.text(propText, (PAGE_W - tw(doc, propText)) / 2, 120);
 
-  // 4. Project Title
-  let ty = 101;
+  // 4. Accent Line below PROPOSAL
+  sc(doc, BLUE, "fill");
+  const lineW = 30;
+  doc.rect((PAGE_W - lineW) / 2, 130, lineW, 1.5, "F");
+
+  // 5. Project Title
   if (projectTitle && projectTitle.trim()) {
-    doc.setFontSize(16);
-    doc.setFont("helvetica", "bold");
-    sc(doc, ORANGE);
-    const titleLines = wrap(doc, projectTitle.trim(), CW - 10, 16);
+    doc.setFontSize(18);
+    doc.setFont("helvetica", "normal");
+    sc(doc, MID);
+    const titleLines = wrap(doc, projectTitle.trim(), CW - 20, 18);
+    let ty = 145;
     titleLines.forEach((line) => {
       doc.text(line, (PAGE_W - tw(doc, line)) / 2, ty);
-      ty += 9;
+      ty += 8;
     });
   }
 
-  // Calculate where the details section should start
-  let detailsY = Math.max(140, ty + 20);
-
-  // 5. First Dark Bar
+  // 6. Modern Footer Block
+  const bottomY = PAGE_H - 65;
   sc(doc, DARK, "fill");
-  doc.rect(ML, detailsY, CW, 8, "F");
+  doc.rect(0, bottomY, PAGE_W, 65, "F");
 
-  detailsY += 16;
-
-  // 6. Prepared By & Date
+  // Add the details inside the dark block
   doc.setFontSize(10);
+  doc.setFont("helvetica", "bold");
+  
+  let textY = bottomY + 25;
+  
+  // Left side: PREPARED BY
+  sc(doc, "#ffffff", "text");
+  doc.text("PREPARED BY", ML, textY);
   doc.setFont("helvetica", "normal");
-  sc(doc, DARK);
-  doc.text("Prepared By:", ML + 15, detailsY);
   sc(doc, BLUE);
-  doc.text(preparedBy || "Virtual Employee", ML + 55, detailsY);
+  doc.text(preparedBy || "Virtual Employee Pvt. Ltd.", ML, textY + 7);
 
-  detailsY += 10;
-  sc(doc, DARK);
-  doc.text("Date:", ML + 15, detailsY);
+  // Right side: DATE
+  doc.setFont("helvetica", "bold");
+  sc(doc, "#ffffff", "text");
+  doc.text("DATE", PAGE_W - ML - 40, textY);
+  doc.setFont("helvetica", "normal");
   sc(doc, BLUE);
   const displayDate = date || new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
-  doc.text(displayDate, ML + 55, detailsY);
-
-  detailsY += 8;
-
-  // 7. Second Dark Bar
-  sc(doc, DARK, "fill");
-  doc.rect(ML, detailsY, CW, 8, "F");
+  doc.text(displayDate, PAGE_W - ML - 40, textY + 7);
 }
 
 const H1_RE = /^(\d+)\s+([A-Z][A-Z\s&/,]+)$/;
