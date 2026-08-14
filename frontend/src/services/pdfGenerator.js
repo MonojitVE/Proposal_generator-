@@ -182,7 +182,7 @@ function loadImageAsDataUrl(src) {
   });
 }
 
-const BLUE = "#2980B9";
+const BLUE = "#31D5B2";
 const ORANGE = "#E8962A";
 const DARK = "#2C3E50";
 const MID = "#555E6D";
@@ -207,36 +207,19 @@ function tw(doc, text) { return (doc.getStringUnitWidth(text) * doc.getFontSize(
 function wrap(doc, text, maxW, size) { doc.setFontSize(size); return doc.splitTextToSize(text, maxW); }
 
 function drawHeader(doc) {
-  doc.setFontSize(9);
-  doc.setFont("helvetica", "bold");
-  sc(doc, BLUE);
-  const vw = tw(doc, "VIRTUAL");
-  doc.text("VIRTUAL", ML, 13);
-  sc(doc, DARK);
-  doc.text("EMPLOYEE", ML + vw, 13);
+  // Removed "VIRTUAL EMPLOYEE" text per request
   sd(doc, RULE);
   doc.setLineWidth(0.3);
   doc.line(ML, 17, PAGE_W - MR, 17);
 }
 
 function drawCover(doc, { projectTitle, preparedBy, date, logoDataUrl }) {
-  // 1. Text Logo: VIRTUAL EMPLOYEE
-  doc.setFontSize(36);
-  doc.setFont("helvetica", "bold");
-  const vw = tw(doc, "VIRTUAL");
-  const ew = tw(doc, "EMPLOYEE");
-  const logoTextX = (PAGE_W - vw - ew) / 2;
-  sc(doc, BLUE);
-  doc.text("VIRTUAL", logoTextX, 38);
-  sc(doc, DARK);
-  doc.text("EMPLOYEE", logoTextX + vw, 38);
-
-  // 2. The actual Logo image placed under the text
+  // 1. The enlarged Logo image placed at the top (branding text removed)
   if (logoDataUrl) {
-    const logoW = 30;
-    const logoH = 10;
+    const logoW = 80;  // Significantly enlarged logo
+    const logoH = 26;  // Maintained aspect ratio
     const logoX = (PAGE_W - logoW) / 2;
-    doc.addImage(logoDataUrl, 'PNG', logoX, 48, logoW, logoH);
+    doc.addImage(logoDataUrl, 'PNG', logoX, 30, logoW, logoH);
   }
 
   // 3. PROPOSAL FOR
@@ -291,9 +274,11 @@ function drawCover(doc, { projectTitle, preparedBy, date, logoDataUrl }) {
 }
 
 const H1_RE = /^(\d+)\s+([A-Z][A-Z\s&/,]+)$/;
-const H1_STANDALONE_RE = /^(CONTENTS|COMPANY OVERVIEW|PURPOSE OF THE DOCUMENT|KEY DELIVERABLES|OBJECTIVES|FEATURES AND FUNCTIONALITY|TECHNICAL APPROACH|TECHNOLOGY STACK|FUTURE SCOPE|TIME AND BUDGET ESTIMATE|WORKFLOW DIAGRAM)$/i;
+const H1_STANDALONE_RE = /^(CONTENTS|PURPOSE OF THE DOCUMENT|KEY DELIVERABLES|OBJECTIVES|FEATURES AND FUNCTIONALITY|TECHNICAL APPROACH|TECHNOLOGY STACK|FUTURE SCOPE|TIME AND BUDGET ESTIMATE|WORKFLOW DIAGRAM)$/i;
 const BULLET_RE = /^[-•*●]\s+/;
 const SUBHEAD_RE = /^(Frontend|Backend|Database|Architecture|Integrations|Security|DevOps|Workflow|Overview|Timeline|Phases|Budget|Other Tools|System Architecture|Testing|Deployment|Monitoring|Authentication|Requirement Analysis|Post[- ]?Launch|Infrastructure|Caching|Real[- ]?Time|Offline|Storage|AI|Automation|Scalability|Performance|Error Handling):\s*/i;
+const LIST_HEAD_RE = /^\d+\.\s+[^:]+:\s*$/;
+const BOLD_LINE_RE = /^\*\*([^*]+)\*\*\s*$/;
 
 function parseLines(text) {
   const rawLines = text.split("\n");
@@ -351,7 +336,16 @@ function parseLines(text) {
     else if (H1_STANDALONE_RE.test(t)) { blocks.push({ kind: "h1", num: "", title: t }); }
     else if (BULLET_RE.test(t)) { blocks.push({ kind: "bullet", text: t.replace(/^[-•*●]\s+/, "") }); }
     else if (SUBHEAD_RE.test(t)) { blocks.push({ kind: "sub", text: t }); }
-    else { blocks.push({ kind: "body", text: t }); }
+    else if (LIST_HEAD_RE.test(t)) { blocks.push({ kind: "sub", text: t }); }
+    else if (BOLD_LINE_RE.test(t)) { blocks.push({ kind: "sub", text: t.replace(/\*\*/g, "") }); }
+    else { 
+      const last = blocks[blocks.length - 1];
+      if (last && (last.kind === "body" || last.kind === "bullet" || last.kind === "sub")) {
+        last.text += " " + t;
+      } else {
+        blocks.push({ kind: "body", text: t }); 
+      }
+    }
 
     i++;
   }
