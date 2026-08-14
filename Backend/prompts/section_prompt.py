@@ -209,13 +209,15 @@ d_technology_stack_prompts = {
     "formatting_instruction": """
 Format the output strictly like this:
  
-● Frontend: <one technology>
-● Backend: <one technology>
-● Database: <one technology>
-● AI & Automation: <one technology> (only if applicable)
-● Integrations: <one technology>
-● Infrastructure & DevOps: <one technology>
-● Security: <one technology>
+| Category | Technology |
+|---|---|
+| Frontend | <one technology> |
+| Backend | <one technology> |
+| Database | <one technology> |
+| AI & Automation | <one technology> |
+| Integrations | <one technology> |
+| Infrastructure & DevOps | <one technology> |
+| Security | <one technology> |
  
 Rules:
 - Only ONE technology per category
@@ -226,6 +228,48 @@ Rules:
 }
  
  
+workflow_diagram_prompt = """
+### 4. Workflow Diagram (MANDATORY)
+This section is REQUIRED. Generate a complete workflow diagram based ONLY on the PROJECT INFORMATION and the client's requirements.
+
+Rules:
+- Return a valid Mermaid flowchart using `flowchart TD`.
+- Do NOT skip this section.
+- Do NOT say "Not enough information" or omit the diagram.
+- Infer the logical workflow from the requirements when necessary.
+- Include all major actors and system components, such as:
+  - User/Admin/Client
+  - Frontend
+  - Backend/API
+  - Database
+  - AI/ML Services
+  - Third-party APIs
+  - Approval steps
+  - Notifications
+  - Decision points
+- Do NOT invent features that contradict the requirements.
+- The workflow should represent the complete end-to-end process from user action to final output.
+
+Output ONLY the Mermaid code.
+
+Example:
+```mermaid
+flowchart TD
+    A[User] --> B[Login]
+    B --> C{Authenticated?}
+    C -->|Yes| D[Dashboard]
+    C -->|No| E[Access Denied]
+    D --> F[Submit Request]
+    F --> G[Backend API]
+    G --> H[(Database)]
+    G --> I[AI Service]
+    I --> J[Response]
+    H --> J
+    J --> K[Display Result]
+```
+"""
+
+
 future_scope_prompt = {
  
     "overall_instruction": "Generate a Future Scope section based on the project details. Ensure outputs are domain-agnostic and adaptable to any industry.",

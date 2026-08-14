@@ -133,6 +133,44 @@ export default function ProposalForm({ form, updateField, onSubmit, loading, err
         </div>
       </section>
 
+      {/* 05 — Extras */}
+      <section className="proposal-form__section">
+        <div className="proposal-form__section-header">
+          <span className="proposal-form__section-num">05</span>
+          <div>
+            <h2 className="proposal-form__section-title">Extras</h2>
+            <p className="proposal-form__section-desc">Optional enhancements to include in your proposal.</p>
+          </div>
+        </div>
+        <div className="proposal-form__fields">
+          <label className="proposal-form__toggle" htmlFor="include_flow_diagram">
+            <div className="proposal-form__toggle-info">
+              <span className="proposal-form__toggle-label">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="proposal-form__toggle-icon">
+                  <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+                </svg>
+                Include Flow Diagram
+              </span>
+              <span className="proposal-form__toggle-hint">
+                Generates a Mermaid workflow diagram showing the end-to-end system flow. Adds ~10s to generation time.
+              </span>
+            </div>
+            <div className={`proposal-form__switch ${form.include_flow_diagram ? "proposal-form__switch--on" : ""}`}>
+              <input
+                id="include_flow_diagram"
+                type="checkbox"
+                checked={form.include_flow_diagram}
+                onChange={(e) => updateField("include_flow_diagram", e.target.checked)}
+                className="proposal-form__switch-input"
+              />
+              <span className="proposal-form__switch-track">
+                <span className="proposal-form__switch-thumb" />
+              </span>
+            </div>
+          </label>
+        </div>
+      </section>
+
       {error && (
         <div className="proposal-form__error" role="alert">
           <span>⚠</span> {error}

@@ -135,6 +135,7 @@ export default function ProposalPage() {
               "Features & Functionality",
               "Technical Approach",
               "Technology Stack",
+              ...(formData?.include_flow_diagram ? ["Workflow Diagram"] : []),
               "Future Scope",
               "Time & Budget Estimate",
             ].map((s, i) => (

@@ -76,11 +76,13 @@ Database: <list>
 Integrations: <list>
 DevOps: <list>
 Other Tools: <list>
- 
-8 FUTURE SCOPE
+
+8 Work FLow diagram
+
+9 FUTURE SCOPE
 - <future enhancement>
  
-9 TIME AND BUDGET ESTIMATE
+10 TIME AND BUDGET ESTIMATE
  
 Timeline: <duration>
  

@@ -86,6 +86,96 @@
   line-height: 1.5;
 }
 
+/* ── Toggle switch (Extras section) ────────────────────────── */
+
+.proposal-form__toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 18px;
+  background: var(--surface-2, #f8f9fb);
+  border: 1px solid var(--surface-3, #e5e7eb);
+  border-radius: var(--radius-md, 10px);
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.proposal-form__toggle:hover {
+  border-color: var(--accent, #3b82f6);
+  background: var(--accent-light, #eff6ff);
+}
+
+.proposal-form__toggle-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.proposal-form__toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink, #1e293b);
+}
+
+.proposal-form__toggle-icon {
+  color: var(--accent, #3b82f6);
+  flex-shrink: 0;
+}
+
+.proposal-form__toggle-hint {
+  font-size: 12px;
+  color: var(--ink-muted, #64748b);
+  line-height: 1.5;
+  padding-left: 24px;
+}
+
+/* Switch track + thumb */
+.proposal-form__switch {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.proposal-form__switch-input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.proposal-form__switch-track {
+  display: block;
+  width: 44px;
+  height: 24px;
+  background: #cbd5e1;
+  border-radius: 12px;
+  position: relative;
+  transition: background 0.25s ease;
+}
+
+.proposal-form__switch--on .proposal-form__switch-track {
+  background: var(--accent, #3b82f6);
+}
+
+.proposal-form__switch-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background: #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  transition: transform 0.25s ease;
+}
+
+.proposal-form__switch--on .proposal-form__switch-thumb {
+  transform: translateX(20px);
+}
+
 @media (max-width: 640px) {
   .proposal-form__fields--grid {
     grid-template-columns: 1fr;

@@ -6,6 +6,7 @@ from core.section_generators import (
     generate_features,
     generate_technical_approach,
     generate_technology_stack,
+    generate_workflow_diagram,
     generate_future_scope,
     generate_time_budget,
 )
@@ -17,6 +18,7 @@ def generate_proposal(
     user_budget: str = "",
     user_phases: str = "",
     user_resources: str = "",
+    include_flow_diagram: bool = False,
 ) -> str:
     """
     Main pipeline: generates a full proposal section by section.
@@ -36,6 +38,8 @@ def generate_proposal(
         Number of phases directly from user input (not LLM-generated).
     user_resources : str
         Resources directly from user input (not LLM-generated).
+    include_flow_diagram : bool
+        Whether to generate a Mermaid workflow diagram section.
 
     Returns
     -------
@@ -97,9 +101,11 @@ Do NOT assume any domain unless specified.
 """
     tech_stack_output = generate_technology_stack(previous)
 
-    # ── Section 8: Future Scope ──────────────────────────────────────────────
-    print("Generating: Future Scope...")
-    previous = f"""
+    # ── Section 8: Workflow Diagram (conditional) ────────────────────────────
+    workflow_diagram_output = ""
+    if include_flow_diagram:
+        print("Generating: Workflow Diagram...")
+        previous = f"""
 {base}
 
 4 OBJECTIVES
@@ -114,9 +120,39 @@ Do NOT assume any domain unless specified.
 7 TECHNOLOGY STACK
 {tech_stack_output}
 """
-    future_scope_output = generate_future_scope(previous)
+        workflow_diagram_output = generate_workflow_diagram(previous)
 
-    # ── Section 9: Time and Budget Estimate (user input, no LLM) ─────────────
+    # ── Dynamic section numbering based on whether diagram is included ───────
+    # When diagram is included:  8=Diagram, 9=Future Scope, 10=Time & Budget
+    # When diagram is excluded:  8=Future Scope, 9=Time & Budget
+    sec_future = 9 if include_flow_diagram else 8
+    sec_budget = 10 if include_flow_diagram else 9
+
+    # ── Future Scope ─────────────────────────────────────────────────────────
+    print("Generating: Future Scope...")
+    context_parts = f"""
+{base}
+
+4 OBJECTIVES
+{objective_output}
+
+5 FEATURES AND FUNCTIONALITY
+{features_output}
+
+6 TECHNICAL APPROACH
+{technical_output}
+
+7 TECHNOLOGY STACK
+{tech_stack_output}
+"""
+    if include_flow_diagram:
+        context_parts += f"""
+8 WORKFLOW DIAGRAM
+{workflow_diagram_output}
+"""
+    future_scope_output = generate_future_scope(context_parts)
+
+    # ── Time and Budget Estimate (user input, no LLM) ────────────────────────
     print("Generating: Time and Budget Estimate...")
     time_budget_output = generate_time_budget(user_phases, user_timeline, user_resources)
 
@@ -135,11 +171,17 @@ Do NOT assume any domain unless specified.
 
 7 TECHNOLOGY STACK
 {tech_stack_output}
-
-8 FUTURE SCOPE
+"""
+    if include_flow_diagram:
+        full_context += f"""
+8 WORKFLOW DIAGRAM
+{workflow_diagram_output}
+"""
+    full_context += f"""
+{sec_future} FUTURE SCOPE
 {future_scope_output}
 
-9 TIME AND BUDGET ESTIMATE
+{sec_budget} TIME AND BUDGET ESTIMATE
 {time_budget_output}
 """
 
@@ -180,10 +222,17 @@ Do NOT assume any domain unless specified.
 
 7 TECHNOLOGY STACK
 {tech_stack_output}
-
-8 FUTURE SCOPE
+"""
+    if include_flow_diagram:
+        final_text += f"""
+8 WORKFLOW DIAGRAM
+{workflow_diagram_output}
+"""
+    final_text += f"""
+{sec_future} FUTURE SCOPE
 {future_scope_output}
 
+{sec_budget} TIME AND BUDGET ESTIMATE
 {time_budget_output}
 """
 

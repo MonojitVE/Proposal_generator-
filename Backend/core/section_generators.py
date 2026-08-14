@@ -152,6 +152,7 @@ from prompts.section_prompt import (
     d_technical_approach_prompts,
     d_technology_stack_prompts,
     future_scope_prompt,
+    workflow_diagram_prompt,
 )
 
 
@@ -347,6 +348,11 @@ Context:
 
 Instructions:
 {d_technology_stack_prompts}
+
+CRITICAL: You MUST format the output as a Markdown table exactly like this:
+| Category | Technology |
+|---|---|
+| Frontend | React |
 """
     return call_llm(prompt)
 
@@ -356,13 +362,42 @@ def generate_future_scope(previous_output: str) -> str:
 {SECTION_GUARD}
 
 Generate ONLY:
-8 FUTURE SCOPE
+9 FUTURE SCOPE
 
 Context:
 {previous_output}
 
 Instructions:
 {future_scope_prompt}
+"""
+    return call_llm(prompt)
+
+
+def generate_workflow_diagram(previous_output: str) -> str:
+    prompt = f"""
+You are generating ONLY ONE section of a proposal: a Mermaid workflow diagram.
+
+STRICT RULES:
+- Do NOT generate a full proposal
+- Do NOT include any other sections (Company Overview, Purpose, Objectives, etc.)
+- Return ONLY the mermaid diagram wrapped in triple backticks
+
+Generate ONLY:
+8 WORKFLOW DIAGRAM
+
+Context:
+{previous_output}
+
+Instructions:
+{workflow_diagram_prompt}
+
+CRITICAL: You MUST wrap the diagram in triple backticks with 'mermaid' like this:
+```mermaid
+flowchart TD
+...
+```
+
+Return ONLY the mermaid code block. Nothing else.
 """
     return call_llm(prompt)
 
@@ -376,10 +411,20 @@ def generate_time_budget(
     timeline = user_timeline or "To be confirmed"
     resources = user_resources or "To be confirmed"
 
-    return f"""9 TIME AND BUDGET ESTIMATE
+    # Attempt to parse phases as integer to generate dynamic phase rows, default to 1
+    try:
+        num_phases = int(phases)
+    except ValueError:
+        num_phases = 1
 
-The entire requirement will be completed in {phases} phase(s) and the Ballpark estimate will be {timeline} (Full Time).
+    table_rows = ""
+    for i in range(1, num_phases + 1):
+        table_rows += f"| Phase {i} — Development | To be confirmed |\n"
 
-TOTAL PROJECT TIME: Ballpark estimation will be {timeline} using technologies mentioned, which may vary depending upon the actual complexity and requirements. This duration is based on functionality mentioned in the document.
+    return f"""The entire requirement will be completed in {phases} phase(s) and the Ballpark estimate will be {timeline} (Full Time).
+
+| PHASE | DURATION |
+|---|---|
+{table_rows}| **Total Estimated Timeline** | **{timeline}** |
 
 NO. OF RESOURCES REQUIRED: {resources}"""

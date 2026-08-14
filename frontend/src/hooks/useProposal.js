@@ -13,6 +13,7 @@ const INITIAL_FORM = {
   resources: "",
   client_name: "",
   extra_requirements: "",
+  include_flow_diagram: false,
 };
 
 const GENERATION_STEPS = [
@@ -23,6 +24,7 @@ const GENERATION_STEPS = [
   "Defining Features & Functionality…",
   "Building Technical Approach…",
   "Selecting Technology Stack…",
+  "Generating Workflow Diagram…",
   "Exploring Future Scope…",
   "Estimating Time & Budget…",
   "Assembling final proposal…",

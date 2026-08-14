@@ -111,24 +111,36 @@ function replaceJsonBlocks(text) {
 export function parseProposalText(rawText) {
   if (!rawText) return "";
 
+  // Step 0: Extract mermaid code blocks before any cleaning to preserve them
+  const mermaidBlocks = [];
+  let textWithPlaceholders = rawText.replace(
+    /```mermaid[\s\S]*?```/g,
+    (match) => {
+      const placeholder = `__MERMAID_BLOCK_${mermaidBlocks.length}__`;
+      mermaidBlocks.push(match);
+      return placeholder;
+    }
+  );
+
   // Step 1: Replace all embedded JSON blocks with flattened plain text
-  let cleaned = replaceJsonBlocks(rawText);
+  let cleaned = replaceJsonBlocks(textWithPlaceholders);
 
   // Step 2: Normalise excessive blank lines (max 2 in a row)
   cleaned = cleaned.replace(/\n{3,}/g, "\n\n");
 
   // Step 2.5: Strip markdown formatting that the LLM may still produce
-  // Remove bold markers
-  cleaned = cleaned.replace(/\*\*(.+?)\*\*/g, '$1');
   // Remove markdown heading prefixes (### Heading → Heading)
   cleaned = cleaned.replace(/^#{1,4}\s+/gm, '');
-  // Remove code block fences
-  cleaned = cleaned.replace(/```[\s\S]*?```/g, '');
-  // Remove inline backticks
-  cleaned = cleaned.replace(/`([^`]+)`/g, '$1');
+  // Remove inline backticks (but NOT triple-backtick fences)
+  cleaned = cleaned.replace(/`([^`\n]+)`/g, '$1');
 
   // Step 3: Ensure bullet lines start with "- " consistently
-  cleaned = cleaned.replace(/^[•*]\s+/gm, "- ");
+  cleaned = cleaned.replace(/^[•*●]\s+/gm, "- ");
+
+  // Step 4: Re-insert preserved mermaid blocks
+  mermaidBlocks.forEach((block, i) => {
+    cleaned = cleaned.replace(`__MERMAID_BLOCK_${i}__`, block);
+  });
 
   return cleaned.trim();
 }

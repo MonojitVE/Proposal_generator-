@@ -34,6 +34,7 @@ class ProposalRequest(BaseModel):
     resources: str = ""
     client_name: str = ""
     extra_requirements: str = ""
+    include_flow_diagram: bool = False
 
 
 class ProposalResponse(BaseModel):
@@ -75,6 +76,7 @@ Project Description: {req.description}
             user_budget=req.budget,
             user_phases=req.phases,
             user_resources=req.resources,
+            include_flow_diagram=req.include_flow_diagram,
         )
  
         return ProposalResponse(proposal_text=proposal_text)

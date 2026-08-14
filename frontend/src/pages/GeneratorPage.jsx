@@ -46,6 +46,7 @@ export default function GeneratorPage() {
                 "Features & Functionality",
                 "Technical Approach",
                 "Technology Stack",
+                ...(proposal.form.include_flow_diagram ? ["Workflow Diagram"] : []),
                 "Future Scope",
                 "Time & Budget Estimate",
               ].map((item) => (
