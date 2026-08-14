@@ -1,29 +1,35 @@
-import sys
 import os
-sys.path.insert(0, os.path.dirname(__file__))
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse, FileResponse
-from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, ConfigDict
+
 from pipeline import generate_proposal
-from pdf_generator import create_proposal_pdf
-import io
-import uvicorn
+
 
 app = FastAPI(title="Proposal Generator API")
 
+
+# -----------------------------
+# CORS
+# -----------------------------
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 
+# -----------------------------
+# Request Model
+# -----------------------------
 class ProposalRequest(BaseModel):
-    model_config = ConfigDict(extra='ignore')  # silently drop any unknown fields
+    model_config = ConfigDict(extra="ignore")
 
     description: str
     project_type: str = ""
@@ -37,25 +43,43 @@ class ProposalRequest(BaseModel):
     include_flow_diagram: bool = False
 
 
+# -----------------------------
+# Response Model
+# -----------------------------
 class ProposalResponse(BaseModel):
     proposal_text: str
 
+
+# -----------------------------
+# Health / Root
+# -----------------------------
 @app.get("/")
 def home():
     return {
         "message": "Proposal Generator API is running",
         "health": "/health",
-        "generate": "/generate"
+        "generate": "/generate",
     }
+
+
 @app.get("/health")
-def root():
-    return {"status": "Proposal Generator API is running"}
+def health():
+    return {
+        "status": "Proposal Generator API is running"
+    }
 
 
+# -----------------------------
+# Generate Proposal
+# -----------------------------
 @app.post("/generate", response_model=ProposalResponse)
 def generate(req: ProposalRequest):
+
     if not req.description.strip():
-        raise HTTPException(status_code=400, detail="Project description is required.")
+        raise HTTPException(
+            status_code=400,
+            detail="Project description is required."
+        )
 
     enriched_input = f"""
 Project Description: {req.description}
@@ -78,11 +102,27 @@ Project Description: {req.description}
             user_resources=req.resources,
             include_flow_diagram=req.include_flow_diagram,
         )
- 
-        return ProposalResponse(proposal_text=proposal_text)
+
+        return ProposalResponse(
+            proposal_text=proposal_text
+        )
+
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )
 
 
+# -----------------------------
+# Local Development
+# -----------------------------
 if __name__ == "__main__":
-    uvicorn.run("app:app", host="0.0.0.0", port=8000, reload=True)
+    import uvicorn
+
+    uvicorn.run(
+        "app:app",
+        host="0.0.0.0",
+        port=int(os.getenv("PORT", "8000")),
+        reload=False,
+    )
