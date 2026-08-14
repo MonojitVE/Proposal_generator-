@@ -1,4 +1,9 @@
-const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+// Automatically point to the live Render backend when deployed to Vercel
+const defaultUrl = import.meta.env.PROD 
+  ? "https://proposal-generator-1-o5e2.onrender.com" 
+  : "http://localhost:8000";
+
+const BASE_URL = import.meta.env.VITE_API_URL || defaultUrl;
 
 /**
  * Generate a proposal from form data.
