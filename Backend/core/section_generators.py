@@ -402,29 +402,77 @@ Return ONLY the mermaid code block. Nothing else.
     return call_llm(prompt)
 
 
+# ── Timeline key → human-readable label mapping ─────────────────────────────
+TIMELINE_LABELS = {
+    "1_month":      "< 1 Month",
+    "1_3_months":   "1 – 3 Months",
+    "3_6_months":   "3 – 6 Months",
+    "6_12_months":  "6 – 12 Months",
+    "12_plus":      "12+ Months",
+}
+
+# ── Timeline key → approximate (min, max) month ranges for splitting ─────────
+TIMELINE_MONTHS = {
+    "1_month":      (0.5, 1),
+    "1_3_months":   (1, 3),
+    "3_6_months":   (3, 6),
+    "6_12_months":  (6, 12),
+    "12_plus":      (12, 18),
+}
+
+
+def _format_month_range(lo: float, hi: float) -> str:
+    """Format a (lo, hi) month range into a readable duration string."""
+    def _fmt(v: float) -> str:
+        return str(int(v)) if v == int(v) else f"{v:.1f}"
+
+    if lo == hi:
+        unit = "Month" if lo == 1 else "Months"
+        return f"~{_fmt(lo)} {unit}"
+    return f"~{_fmt(lo)} – {_fmt(hi)} Months"
+
+
 def generate_time_budget(
     user_phases: str = "",
     user_timeline: str = "",
     user_resources: str = ""
 ) -> str:
     phases = user_phases or "1"
-    timeline = user_timeline or "To be confirmed"
     resources = user_resources or "To be confirmed"
 
-    # Attempt to parse phases as integer to generate dynamic phase rows, default to 1
+    # Resolve the human-readable timeline label
+    # If the value is a known key (from the frontend dropdown), map it;
+    # otherwise treat it as free text and use as-is.
+    timeline_key = user_timeline.strip() if user_timeline else ""
+    timeline_label = TIMELINE_LABELS.get(timeline_key, timeline_key) or "To be confirmed"
+
+    # Attempt to parse phases as integer, default to 1
     try:
         num_phases = int(phases)
     except ValueError:
         num_phases = 1
 
-    table_rows = ""
-    for i in range(1, num_phases + 1):
-        table_rows += f"| Phase {i} — Development | To be confirmed |\n"
+    # Calculate per-phase durations if we have a known timeline range
+    month_range = TIMELINE_MONTHS.get(timeline_key)
 
-    return f"""The entire requirement will be completed in {phases} phase(s) and the Ballpark estimate will be {timeline} (Full Time).
+    table_rows = ""
+    if month_range and num_phases > 0:
+        total_lo, total_hi = month_range
+        phase_lo = round(total_lo / num_phases, 1)
+        phase_hi = round(total_hi / num_phases, 1)
+        phase_duration = _format_month_range(phase_lo, phase_hi)
+
+        for i in range(1, num_phases + 1):
+            table_rows += f"| Phase {i} — Development | {phase_duration} |\n"
+    else:
+        # No computable range — fall back to "To be confirmed" per phase
+        for i in range(1, num_phases + 1):
+            table_rows += f"| Phase {i} — Development | To be confirmed |\n"
+
+    return f"""The entire requirement will be completed in {phases} phase(s) and the Ballpark estimate will be {timeline_label} (Full Time).
 
 | PHASE | DURATION |
 |---|---|
-{table_rows}| **Total Estimated Timeline** | **{timeline}** |
+{table_rows}| **Total Estimated Timeline** | **{timeline_label}** |
 
 NO. OF RESOURCES REQUIRED: {resources}"""
